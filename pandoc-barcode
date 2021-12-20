@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+"""
+Pandoc filter to convert all barcode entries to images
+"""
+
+from pandocfilters import toJSONFilter, Para, Image, get_caption
+from barcode import Code128 as Barcode
+from barcode.writer import ImageWriter
+import qrcode
+import sys
+import base64
+import io
+
+def barcode(key, value, format, meta):
+    if key == 'CodeBlock':
+        [[ident, classes, keyvals], code] = value
+        img_bytes=io.BytesIO()
+        if "qrcode" in classes:
+            img=qrcode.make(code)
+            img.save(img_bytes)
+        if "barcode" in classes:
+            img=Barcode(str(code), ImageWriter())
+            img.write(img_bytes, options={"write_text": False})
+        if "qrcode" in classes or "barcode" in classes:
+            caption, typef, keyvals = get_caption(keyvals)
+            dest=img_bytes.getvalue()
+            dest=(base64.b64encode(dest)).decode()
+            dest='data:image/png;base64,{}'.format(dest)
+            return Para([Image([ident, classes, keyvals], caption, [dest, typef])])
+
+if __name__ == "__main__":
+    toJSONFilter(barcode)
