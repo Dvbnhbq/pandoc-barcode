@@ -1,0 +1,24 @@
+# VIM Backup files
+.*.un~
+*~
+
+# History, sessions and cache files
+.bash_history
+.cache
+.node*
+.npm
+.ssh
+.tmux/.wd
+.viminfo
+.Xauthority
+
+# Config files and all other files which were not added manually
+.config
+.*
+*
+
+# Folders
+Desktop
+Downloads
+Music
+Videos
